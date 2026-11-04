@@ -1,0 +1,8 @@
+set script_dir [file dirname [file normalize [info script]]]
+set package_root [file normalize [file join $script_dir ..]]
+cd $script_dir
+
+open_project "@@PROJECT_NAME@@.al"
+import_device eagle_s20.db -package @@DEVICE_PACKAGE@@
+close_project
+exit

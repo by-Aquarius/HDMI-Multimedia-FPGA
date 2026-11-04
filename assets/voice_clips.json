@@ -1,0 +1,67 @@
+{
+  "rate_hz": 6000,
+  "bits": 8,
+  "samples": 15646,
+  "clips": [
+    {
+      "id": 0,
+      "offset": 0,
+      "length": 894
+    },
+    {
+      "id": 1,
+      "offset": 894,
+      "length": 1088
+    },
+    {
+      "id": 2,
+      "offset": 1982,
+      "length": 1153
+    },
+    {
+      "id": 3,
+      "offset": 3135,
+      "length": 1689
+    },
+    {
+      "id": 4,
+      "offset": 4824,
+      "length": 1483
+    },
+    {
+      "id": 5,
+      "offset": 6307,
+      "length": 1419
+    },
+    {
+      "id": 6,
+      "offset": 7726,
+      "length": 1076
+    },
+    {
+      "id": 7,
+      "offset": 8802,
+      "length": 1380
+    },
+    {
+      "id": 8,
+      "offset": 10182,
+      "length": 1221
+    },
+    {
+      "id": 9,
+      "offset": 11403,
+      "length": 1215
+    },
+    {
+      "id": 10,
+      "offset": 12618,
+      "length": 1683
+    },
+    {
+      "id": 11,
+      "offset": 14301,
+      "length": 1345
+    }
+  ]
+}

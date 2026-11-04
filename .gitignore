@@ -1,0 +1,8 @@
+# Generated files
+*.bit
+*.db
+*.log
+*.jou
+*.tmp
+**/bin/
+**/obj/

@@ -1,0 +1,37 @@
+set script_dir [file dirname [file normalize [info script]]]
+set package_root [file normalize [file join $script_dir ..]]
+set source_list [file join $package_root sources sources_release.txt]
+set al_path [file join $script_dir "@@PROJECT_NAME@@.al"]
+
+if {[file exists $al_path]} {
+    error "Refusing to overwrite existing project: $al_path"
+}
+
+cd $script_dir
+create_project @@PROJECT_NAME@@ . -family @@FAMILY@@ -device @@DEVICE@@
+
+set file_handle [open $source_list r]
+set source_count 0
+while {[gets $file_handle line] >= 0} {
+    set line [string trim $line]
+    if {$line eq "" || [string index $line 0] eq "#"} {
+        continue
+    }
+    set source_path [file join .. $line]
+    if {![file exists $source_path]} {
+        close $file_handle
+        error "Packaged source is missing: $source_path"
+    }
+    add_files -analyze $source_path
+    incr source_count
+}
+close $file_handle
+
+puts "HDMI_FINAL_SOURCE_COUNT=$source_count"
+if {$source_count != @@SOURCE_COUNT@@} {
+    error "Expected @@SOURCE_COUNT@@ functional sources, found $source_count"
+}
+
+top_module @@TOP_MODULE@@
+close_project
+exit

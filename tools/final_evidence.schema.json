@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hdmi-final-evidence/v1",
+  "title": "Winning build final packaging evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "winner",
+    "flow",
+    "timing",
+    "drc",
+    "io",
+    "source_freeze",
+    "bitstream",
+    "board_operations",
+    "tf_or_flash_written"
+  ],
+  "properties": {
+    "schema": {
+      "const": "hdmi-final-evidence/v1"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "winner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_name",
+        "place_effort",
+        "place_opt_timing",
+        "place_fix_hold",
+        "place_post_clock_route_opt",
+        "place_pr_strategy",
+        "place_new_spreading",
+        "route_effort",
+        "route_opt_timing",
+        "route_fix_hold",
+        "standalone_fix_hold"
+      ],
+      "properties": {
+        "profile_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "place_effort": {
+          "enum": ["low", "medium", "high"]
+        },
+        "place_opt_timing": {
+          "enum": ["low", "medium", "high"]
+        },
+        "place_fix_hold": {
+          "enum": ["on", "off"]
+        },
+        "place_post_clock_route_opt": {
+          "enum": ["on", "off"]
+        },
+        "place_pr_strategy": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "place_new_spreading": {
+          "enum": ["on", "off"]
+        },
+        "route_effort": {
+          "enum": ["low", "medium", "high"]
+        },
+        "route_opt_timing": {
+          "enum": ["low", "medium", "high"]
+        },
+        "route_fix_hold": {
+          "enum": ["on", "off"]
+        },
+        "standalone_fix_hold": {
+          "type": "boolean"
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report",
+        "setup_errors",
+        "hold_errors",
+        "setup_wns_ns",
+        "hold_wns_ns",
+        "sha256"
+      ],
+      "properties": {
+        "report": {
+          "type": "string",
+          "description": "Actual winning report path, relative to build-dir."
+        },
+        "setup_errors": {
+          "const": 0
+        },
+        "hold_errors": {
+          "const": 0
+        },
+        "setup_wns_ns": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hold_wns_ns": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "drc": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report",
+        "status",
+        "violations",
+        "sha256"
+      ],
+      "properties": {
+        "report": {
+          "type": "string",
+          "description": "Actual native DRC report path, relative to build-dir."
+        },
+        "status": {
+          "const": "PASS"
+        },
+        "violations": {
+          "const": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "io": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report",
+        "status",
+        "expected_pins",
+        "matched_pins",
+        "sha256"
+      ],
+      "properties": {
+        "report": {
+          "type": "string",
+          "description": "Actual native IO report path, relative to build-dir."
+        },
+        "status": {
+          "const": "PASS"
+        },
+        "expected_pins": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "matched_pins": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "source_freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest",
+        "change_review",
+        "status",
+        "source_count",
+        "manifest_hashes_match",
+        "adc_unchanged",
+        "sdc_unchanged"
+      ],
+      "properties": {
+        "manifest": {
+          "const": "source_manifest_sha256.json"
+        },
+        "change_review": {
+          "const": "validation/source_change_review.json"
+        },
+        "status": {
+          "const": "PASS"
+        },
+        "source_count": {
+          "const": 89
+        },
+        "manifest_hashes_match": {
+          "const": true
+        },
+        "adc_unchanged": {
+          "const": true
+        },
+        "sdc_unchanged": {
+          "const": true
+        }
+      }
+    },
+    "bitstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "sha256",
+        "timing_report_sha256"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Actual winning bitstream path, relative to build-dir."
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "timing_report_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "board_operations": {
+      "const": false
+    },
+    "tf_or_flash_written": {
+      "const": false
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    }
+  }
+}

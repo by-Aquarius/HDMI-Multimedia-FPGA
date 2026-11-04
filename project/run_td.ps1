@@ -1,0 +1,116 @@
+param(
+    [ValidateSet("create", "synth", "phy", "all")]
+    [string]$Stage = "create",
+    [string]$TdExe = $env:TD_COMMANDS_PROMPT,
+    [ValidateRange(1, 86400)]
+    [int]$CreateTimeoutSeconds = 1800,
+    [ValidateRange(1, 86400)]
+    [int]$StageTimeoutSeconds = 3600
+)
+
+$ErrorActionPreference = "Stop"
+$projectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+if (-not $TdExe) {
+    $TdExe = "C:\Anlogic\TD_5.6.5_SP3_151.449\bin\td_commands_prompt.exe"
+}
+if (-not (Test-Path -LiteralPath $TdExe)) {
+    throw "TD command executable not found: $TdExe"
+}
+
+function Invoke-TdStage {
+    param(
+        [string]$ScriptName,
+        [string]$LogName,
+        [string[]]$RequiredPatterns = @(),
+        [int]$TimeoutSeconds = 3600
+    )
+    $scriptPath = Join-Path $projectDir $ScriptName
+    if (-not (Test-Path -LiteralPath $scriptPath)) {
+        throw "TD script missing: $scriptPath"
+    }
+
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = $TdExe
+    $startInfo.WorkingDirectory = $projectDir
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardInput = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    if (-not $process.Start()) {
+        throw "Failed to start TD: $TdExe"
+    }
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
+    $scriptText = [System.IO.File]::ReadAllText($scriptPath, $utf8)
+    $timedOut = $false
+
+    try {
+        $process.StandardInput.Write($scriptText)
+        $process.StandardInput.Flush()
+        # Keep stdin open until TD exits from the Tcl exit command.
+        if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
+            $timedOut = $true
+            $process.Kill()
+            $process.WaitForExit()
+        }
+    } finally {
+        try {
+            $process.StandardInput.Close()
+        } catch {
+        }
+    }
+
+    $stdout = $stdoutTask.GetAwaiter().GetResult()
+    $stderr = $stderrTask.GetAwaiter().GetResult()
+    $logPath = Join-Path $projectDir $LogName
+    $logText = "command=$TdExe`nworking_directory=$projectDir`n" +
+        "timed_out=$timedOut`nexit_code=$($process.ExitCode)`n" +
+        "---- TD OUTPUT ----`n$stdout`n---- TD STDERR ----`n$stderr`n"
+    [System.IO.File]::WriteAllText($logPath, $logText, $utf8)
+
+    if ($timedOut) {
+        throw "TD stage timed out after $TimeoutSeconds seconds: $ScriptName"
+    }
+    if ($process.ExitCode -ne 0) {
+        throw "TD stage failed with exit code $($process.ExitCode): $ScriptName"
+    }
+    foreach ($pattern in $RequiredPatterns) {
+        if ($logText -notmatch $pattern) {
+            throw "TD log missing required success marker '$pattern': $logPath"
+        }
+    }
+    Write-Host "PASS: $ScriptName"
+}
+
+switch ($Stage) {
+    "create" {
+        Invoke-TdStage "create_project.tcl" "create_analyze.log" @(
+            "HDMI_FINAL_SOURCE_COUNT=89",
+            "Project manager successfully analyzed\s+89\s+source files"
+        ) -TimeoutSeconds $CreateTimeoutSeconds
+    }
+    "synth"  {
+        Invoke-TdStage "synthesize.tcl" "synthesize.log" @() `
+            -TimeoutSeconds $StageTimeoutSeconds
+    }
+    "phy"    {
+        Invoke-TdStage "place_route.tcl" "place_route.log" @() `
+            -TimeoutSeconds $StageTimeoutSeconds
+    }
+    "all" {
+        Invoke-TdStage "create_project.tcl" "create_analyze.log" @(
+            "HDMI_FINAL_SOURCE_COUNT=89",
+            "Project manager successfully analyzed\s+89\s+source files"
+        ) -TimeoutSeconds $CreateTimeoutSeconds
+        Invoke-TdStage "synthesize.tcl" "synthesize.log" @() `
+            -TimeoutSeconds $StageTimeoutSeconds
+        Invoke-TdStage "place_route.tcl" "place_route.log" @() `
+            -TimeoutSeconds $StageTimeoutSeconds
+    }
+}

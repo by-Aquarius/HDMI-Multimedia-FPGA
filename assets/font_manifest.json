@@ -1,0 +1,27 @@
+{
+  "glyph_count": 2048,
+  "glyph_size": "16x16; FPGA doubles to 32x32",
+  "message_limit": 64,
+  "runtime_protocol": "UTF-16 BMP codes only; no glyph/bitmap upload",
+  "font": "GNU Unifont 16.0.04",
+  "font_source": "https://unifoundry.com/pub/unifont/unifont-16.0.04/font-builds/unifont-16.0.04.hex.gz",
+  "font_license": "SIL OFL 1.1; license retained",
+  "selection_source": "https://github.com/ruddfawcett/hanziDB.csv",
+  "selection_license": "MIT; license retained",
+  "builtin_lengths": [
+    17,
+    15,
+    14,
+    15
+  ],
+  "assets_sha256": {
+    "builtin_codes.hex": "bd04ba77243b89308619070d6bf05443b8a4714cd1ee275b25ea79826f849947",
+    "builtin_messages.json": "543e847e84104978ad54f99e9f6f6590da07622043051a9c5a85e8699d398359",
+    "font_codes.hex": "c74f59bb6ddeab4ed3c67c68bb5320ebef6ee1fd88a94b3239edf32cbeb11566",
+    "font_rows.hex": "6a28a91e42ca795b33d2d046bb26dd911cb473df6d973e7b8e939a19e50f93ce",
+    "hanzi_frequency.csv": "fde27fd1cdc78de4e924f68e1c2750c8a30964d25e5cc75478bb01631b7169cf",
+    "HANZI_LICENSE.txt": "321fbc7640cdd947a44d17b9810e273a3ba7ac75e4d32ab1aee9adfa58bc122f",
+    "unifont.hex.gz": "f9c8c7802453f47be02677176aeac2342ee96d354fad7a26cedcce48e68e1d9f",
+    "UNIFONT_LICENSE.txt": "1e74cb82bf476843e97c2596297b04219b1a7e51f7238944a8c031cb9401fa87"
+  }
+}
